@@ -1,0 +1,11 @@
+<h1>UPDATE THE BLOG</h1>
+
+{{#each data}}
+<h1>hey this is id!! {{id}}</h1>
+<form class="" action="./{{id}}" method="post">
+  <input type="text" name="updateTitle"  value="{{title}}">
+  <input type="text" name="updateContent" value="{{content}}">
+  </br>
+  <input type="submit" name="name" value="">
+</form>
+{{/each}}

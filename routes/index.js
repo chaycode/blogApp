@@ -8,13 +8,25 @@ function getUser(){
   return knex('user_tbl')
 }
 
+function getPost(){
+  return knex('post_tbl')
+}
+
+function getComment(){
+  return knex('comment_tbl')
+}
+
+function commentUser(){
+  return knex('*').from('post_tbl').leftJoin('comment_tbl', 'post_tbl.id', 'comment_tbl.post_id')
+}
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
 router.post('/register', function(req, res, next){
-  console.log(getUser(req.body.newUsername))
+  console.log(getUser().username)
     getUser()
     .insert({
        username: req.body.newUsername,
@@ -55,19 +67,113 @@ router.post('/login', function(req, res, next){
       } else {
         res.send("your passwerd wes inkerrekt")
       }
-      // return res.send('YOURE FUCKING RITE!!!')
     }
-  //   console.log(err, user, info)
-  //  return res.redirect('/users')
  })(req, res, next)
 })
 
+// router.get('/home', function(req, res, next){
+//   getPost().orderBy('id', 'asc')
+//   .then(function(data){
+//       res.render("home", {posts: data})
+//   })
+// })
+
+// router.get('/home', function(req, res, next){
+//   commentUser()
+//   .then(function(data){
+//     console.log("COMMENT USER DASTA:", data)
+//       res.render("home", {posts: data})
+//   })
+// })
+
 router.get('/home', function(req, res, next){
-  res.render("home")
+  var everything = []
+  getPost()
+  .then(function(data){
+    everything.push(data)
+    console.log("THE FIRST EVERYTHING:  ",everything)
+    getComment()
+    .then(function(data){
+      everything.push(data)
+      console.log("EVERYHTING 2222:: ", everything)
+      res.render('home', {posts: everything[0], comments: everything[1]})
+    })
+  })
 })
 
-// app.post('/auth', passport.authenticate('local'), function(req, res){
-//   console.log("passport user", req.user);
-// });
+router.post('/createPost', function(req, res, next){
+  getPost()
+  .insert({title: req.body.postTitle, content: req.body.postContent})
+  .then(function(data){
+    res.redirect('/home')
+  })
+})
+
+router.get('/post/:id', function(req, res, next){
+  var commentPosts = []
+  getComment().where('post_id', req.params.id)
+  .then(function(data){
+      commentPosts.push(data)
+      console.log("FIRST COMMENT POSTS:   ",commentPosts)
+    getPost().where("id", req.params.id)
+    .then(function(data){
+        commentPosts.push(data)
+      console.log("SECOND COMMENTPOSTS:  ", commentPosts)
+      console.log("DATA [1]!!!!:", commentPosts[1], "DATA [0]!!!::: ", commentPosts[0])
+      res.render('post', {posts: commentPosts[1], comments: commentPosts[0]})
+    })
+  })
+})
+
+router.get('/delete/:id',function(req, res, next){
+  var param = req.params.id.replace(/:/g,"")
+  console.log(req.params.id, param)
+  getPost().where('id', param)
+  .delete()
+  .then(function(data){
+    res.redirect('/home')
+  })
+})
+
+router.get('/update/:id', function(req, res, next){
+  var param = req.params.id.replace(/:/g,"")
+  getPost().where('id', param)
+  .then(function(data){
+    console.log("THIS DAT RITE HERR", data)
+      res.render('updateThis', {data})
+  })
+})
+
+router.post('/update/:id', function(req, res, next){
+  var param = req.params.id.replace(/:/g,"")
+  console.log(req.params.id, param, req.body.updateTitle, req.body.updateContent)
+  getPost().where('id', req.params.id)
+  .update({title: req.body.updateTitle, content: req.body.updateContent})
+  .then(function(data){
+    console.log("DATA COMING TRU", data)
+    res.redirect('/post/'+param)
+  })
+})
+
+router.post('/comment/:id', function(req, res, next){
+console.log("THIS IS REQQQQQ:::   ",req.body.comment)
+var param = req.params.id.replace(/:/g, "")
+  getComment()
+  .insert({comment: req.body.comment, post_id: param})
+  .then(function(data){
+    console.log("THIS IS DATTAAAA:", data)
+    res.redirect('/post/'+param)
+  })
+})
+
+// router.get('/update/:id', function(req, res, next){
+  // var param = req.params.id.replace(/:/g,"")
+  // getPost().where('id', param)
+  // .then(function(data){
+      // res.render('updateThis')
+  // })
+// })
+
+// router.post('update/:id')
 
 module.exports = router;

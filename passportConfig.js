@@ -14,6 +14,7 @@ passport.use(
     console.log("GOT LOCALthis username:  ", username, " and passwored:  ", password)
     return getUser(username)
       .then(function(data){
+
         done(null, data)
       })
   }))

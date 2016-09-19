@@ -1,2 +1,25 @@
-<h1>Welcome Home</h1>
+<a href='/'>LOGIN</a>
+<h1>Welcome TO IGTOPIA</h1>
 <h3>sigh</h3>
+
+<form class="" action="/createPost" method="post">
+  <input type="text" name="postTitle" value="" placeholder="title">
+  <input type="text" name="postContent" value="" placeholder="content">
+  <input type="submit" name="name" value="BLOG IT!">
+</form>
+
+<!-- {{posts}}
+
+<h1>{{title}}</h1>
+<h2>{{content}}</h2>
+<h3>{{comment}}</h3>
+<p>{{id}}</p>
+<p>{{post_id}}</p> -->
+
+{{#each posts}}
+</br></br>
+<h2><a href= "/post/{{id}}">{{title}}</a></h2>
+<p>{{id}}</p>
+<p>{{post_id}}</p>
+</br>
+{{/each}}
