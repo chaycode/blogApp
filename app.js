@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+
 var passport = require('passport')
 
 var routes = require('./routes/index');
@@ -21,6 +23,17 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+//including passport-session from passportWithDanny
+app.use(session({
+  secret: 'keyboard cat',
+  saveUninitialized: true,
+  resave: false
+}));
+app.use(passport.initialize());
+// Mount Passport session middleware onto Express
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 var passportStrategies = require('./passportConfig')
 
